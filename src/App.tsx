@@ -55,16 +55,16 @@ function App() {
           <legend>Category</legend>
           <div className="toggle-group">
             <button
-              className={category === 'event' ? 'active' : ''}
-              onClick={() => setCategory('event')}
-            >
-              Event
-            </button>
-            <button
               className={category === 'pokemon' ? 'active' : ''}
               onClick={() => setCategory('pokemon')}
             >
               Pokemon
+            </button>
+            <button
+              className={category === 'event' ? 'active' : ''}
+              onClick={() => setCategory('event')}
+            >
+              Event
             </button>
           </div>
         </fieldset>
