@@ -5,11 +5,10 @@ import type { Region, Category } from '../lib/data'
 export function usePasswordForm() {
   const [password, setPassword] = useState('')
   const [region, setRegion] = useState<Region>('na')
-  const [category, setCategory] = useState<Category>('event')
-  const [flagNumber, setFlagNumber] = useState(0)
+  const [category, setCategory] = useState<Category>('pokemon')
+  const [flag, setFlag] = useState(0)
   const [pokemon, setPokemon] = useState(POKEMON_LIST[0])
-  const [event, setEvent] = useState(EVENT_LIST[0])
-
+  
   const encode = () => {
     // TODO: implement encoding logic
   }
@@ -22,10 +21,9 @@ export function usePasswordForm() {
     password, setPassword,
     region, setRegion,
     category, setCategory,
-    flagNumber, setFlagNumber,
+    flag, setFlag,
     pokemon, setPokemon,
-    event, setEvent,
-    encode,
+        encode,
     decode,
   }
 }
