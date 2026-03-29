@@ -1,8 +1,3 @@
-# React + TypeScript + Vite
+# Conquest Password Gen
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This is a website allowing the creation and decoding of in game passwords for [Pokémon Conquest](https://en.wikipedia.org/wiki/Pok%C3%A9mon_Conquest).  All credit for the functionality of this project goes to [Prof. 9](https://gbatemp.net/members/prof-9.128772/) on the GBATemp forum who created a Windows application for this purpose in 2012 after cracking the game's password algorithm.  I have simply recreated [his work](https://gbatemp.net/threads/pokemon-conquest-password-generator.329260/) as a web application.
