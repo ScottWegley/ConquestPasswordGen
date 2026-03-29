@@ -1,5 +1,5 @@
 import { usePasswordForm } from './hooks/usePasswordForm'
-import { POKEMON_LIST, EVENT_LIST, DISALLOWED_POKEMON } from './lib/data'
+import { POKEMON_LIST, EVENT_LIST } from './lib/data'
 import './App.css'
 
 function App() {
