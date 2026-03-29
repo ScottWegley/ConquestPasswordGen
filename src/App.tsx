@@ -7,9 +7,8 @@ function App() {
     password, setPassword,
     region, setRegion,
     category, setCategory,
-    flagNumber, setFlagNumber,
+    flag, setFlag,
     pokemon, setPokemon,
-    event, setEvent,
     encode,
     decode,
   } = usePasswordForm();
@@ -74,9 +73,10 @@ function App() {
           <span>Flag Number</span>
           <input
             type="number"
-            value={flagNumber}
-            onChange={(e) => setFlagNumber(Number(e.target.value))}
+            value={flag}
+            onChange={(e) => setFlag(Number(e.target.value))}
             min={0}
+            max={(category === 'event' ? 4 : 63)}
           />
         </label>
 
@@ -94,7 +94,7 @@ function App() {
         {category === 'event' && (
           <label className="field">
             <span>Event</span>
-            <select value={event} onChange={(e) => setEvent(e.target.value)}>
+            <select value={EVENT_LIST[flag]} disabled={true} onChange={(e) => {}} title={"The value of the event is determined by the flag number."}>
               {EVENT_LIST.map((e) => (
                 <option key={e} value={e}>{e}</option>
               ))}
