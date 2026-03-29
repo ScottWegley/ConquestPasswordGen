@@ -18,7 +18,7 @@ export const EVENT_LIST = [
 /** Type representing the region of the game associated with the password. */
 export type Region = 'na' | 'jp';
 /** Type representing the category of the password, either Event or Pokemon. */
-export type Category = 'event' | 'pokemon';
+export type Category = 'pokemon' | 'event';
 /** Type containing the characters used in NA Passwords. */
 export const NA_PASSWORD_CHARS = "RJ8XB2cCmkZnDVqExFgGHraK3LwMN1ApW5iPUQzuS4TtvYb6de9fhjsy7";
 /** Type containing the characters used in JP Passwords. */
