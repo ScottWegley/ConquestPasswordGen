@@ -1,5 +1,5 @@
 import { usePasswordForm } from './hooks/usePasswordForm'
-import { POKEMON_LIST, EVENT_LIST } from './lib/data'
+import { POKEMON_LIST, EVENT_LIST, DISALLOWED_POKEMON } from './lib/data'
 import './App.css'
 
 function App() {
@@ -84,8 +84,10 @@ function App() {
           <label className="field">
             <span>Pokemon</span>
             <select value={pokemon} onChange={(e) => setPokemon(e.target.value)}>
-              {POKEMON_LIST.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {POKEMON_LIST.map((p, i) => (
+                DISALLOWED_POKEMON.indexOf(i) === -1 && (
+                  <option key={p} value={p}>{p}</option>
+                )
               ))}
             </select>
           </label>
