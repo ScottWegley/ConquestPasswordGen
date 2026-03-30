@@ -96,7 +96,7 @@ function App() {
         {category === 'event' && (
           <label className="field">
             <span>Event</span>
-            <select value={EVENT_LIST[flag]} disabled={true} onChange={(e) => {}} title={"The value of the event is determined by the flag number."}>
+            <select value={EVENT_LIST[flag]} disabled={true} onChange={() => {}} title={"The value of the event is determined by the flag number."}>
               {EVENT_LIST.map((e) => (
                 <option key={e} value={e}>{e}</option>
               ))}
