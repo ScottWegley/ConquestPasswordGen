@@ -11,7 +11,7 @@ export function usePasswordForm() {
 
   const encode = () => {
     let passwd: Password = new Password(region, category, flag, pokemon);
-    setPassword(passwd.encode());
+    setPassword(passwd.encode(true));
   }
 
   const decode = () => {
@@ -97,7 +97,7 @@ export class Password {
   }
   // #endregion
 
-  public encode(): string {
+  public encode(debug: boolean = false): string {
     // First we construct the raw bytes containing the password data
     let rawBytes: number[] = [];
     rawBytes[0] = (this._category === 'pokemon' ? 0 : 1);
@@ -107,33 +107,45 @@ export class Password {
     rawBytes[4] = rawBytes[2] + 2;
     rawBytes[5] = POKEMON_LIST.indexOf(this._pokemon);
 
-    console.log(`Raw bytes: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    if (debug) {
+      console.log(`Raw bytes: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    }
 
     // Second we calculate the secondary checksum of the raw bytes
     let checksum = rawBytes[5];
     for (let i = 0; i < 5; i++) {
       checksum += rawBytes[i] & 0x3f;
     }
-    console.log(`Sum of raw bytes: ${checksum.toString(16).padStart(2, '0')}`);
+    if (debug) {
+      console.log(`Sum of raw bytes: ${checksum.toString(16).padStart(2, '0')}`);
+    }
     checksum = checksum & 0x3ff;
 
-    console.log(`Secondary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+    if (debug) {
+      console.log(`Secondary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+    }
 
     // Third we embed the checksum back into the raw bytes
     for (let i = 0; i < 6; i++) {
       rawBytes[i] |= ((checksum >> (i * 2)) & 3) << 6;
     }
-    console.log(`Raw bytes with checksum: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    if (debug) {
+      console.log(`Raw bytes with checksum: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    }
 
     // Fourth we apply the scramble pattern
     let scrambleCode = (this._region === 'na' ? NA_SCRAMBLE_CODES : JP_SCRAMBLE_CODES)[this._scramblePattern].toString(16).padStart(6, '0').split('').map(Number);
-    console.log(`Scramble code: ${scrambleCode.map(n => n.toString(16)).join('')}`);
+    if (debug) {
+      console.log(`Scramble code: ${scrambleCode.map(n => n.toString(16)).join('')}`);
+    }
 
     let shuffledBytes: number[] = [];
     for (let i = 0; i < 6; i++) {
       shuffledBytes[scrambleCode[i]] = rawBytes[i] ^ i;
     }
-    console.log(`Shuffled bytes: ${shuffledBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    if (debug) {
+      console.log(`Shuffled bytes: ${shuffledBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    }
 
     // Fifth we convert the shuffled bytes into the final password string
     let passBytes: number[] = [];
@@ -170,19 +182,31 @@ export class Password {
       passBytes[7] = Math.floor(shuffledBytes[3] / 0x42) | (Math.floor(shuffledBytes[4] / 0x42) << 2) | (Math.floor(shuffledBytes[5] / 0x42) << 4);
     }
 
+    if (debug) {
+      console.log(`Pass bytes: ${passBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+    }
+
     if (this._region === 'na') {
       // Sixth we calculate the primary checksum and store it (NA only).
       let mesh = (shuffledBytes[0] & 0xf) | (shuffledBytes[1] & 0xf) << 4;
       checksum = Math.floor(mesh / 0x39);
 
       passBytes[4] |= (checksum & 0x7) << 3;
-      console.log(`Group 1 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+      if (debug) {
+        console.log(`Group 1 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+      }
 
       mesh = (shuffledBytes[3] & 0xf) | (shuffledBytes[4] & 0xf) << 4;
       checksum = Math.floor(mesh / 0x39);
 
       passBytes[9] |= (checksum & 0x7) << 3;
-      console.log(`Group 2 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+      if (debug) {
+        console.log(`Group 2 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+      }
+
+      if (debug) {
+        console.log(`Pass bytes after primary checksum: ${passBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
+      }
     }
 
     // Finally we convert the password data into characters.
@@ -191,7 +215,9 @@ export class Password {
     for (let i = 0; i < passBytes.length; i++) {
       password += charSet[passBytes[i]];
     }
-    console.log(`Final password: ${password}`);
+    if (debug) {
+      console.log(`Final password: ${password}`);
+    }
     return password;
   }
 }
