@@ -62,7 +62,7 @@ function App() {
             </button>
             <button
               className={category === 'event' ? 'active' : ''}
-              onClick={() => setCategory('event')}
+              onClick={() => {setCategory('event'); if (flag > 4) setFlag(4);}}
             >
               Event
             </button>
