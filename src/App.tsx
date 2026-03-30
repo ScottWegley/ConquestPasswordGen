@@ -1,5 +1,5 @@
 import { usePasswordForm } from './hooks/usePasswordForm'
-import { POKEMON_LIST, EVENT_LIST } from './lib/data'
+import { POKEMON_LIST, EVENT_LIST, DISALLOWED_POKEMON } from './lib/data'
 import './App.css'
 
 function App() {
@@ -7,9 +7,8 @@ function App() {
     password, setPassword,
     region, setRegion,
     category, setCategory,
-    flagNumber, setFlagNumber,
+    flag, setFlag,
     pokemon, setPokemon,
-    event, setEvent,
     encode,
     decode,
   } = usePasswordForm();
@@ -56,16 +55,16 @@ function App() {
           <legend>Category</legend>
           <div className="toggle-group">
             <button
-              className={category === 'event' ? 'active' : ''}
-              onClick={() => setCategory('event')}
-            >
-              Event
-            </button>
-            <button
               className={category === 'pokemon' ? 'active' : ''}
               onClick={() => setCategory('pokemon')}
             >
               Pokemon
+            </button>
+            <button
+              className={category === 'event' ? 'active' : ''}
+              onClick={() => setCategory('event')}
+            >
+              Event
             </button>
           </div>
         </fieldset>
@@ -74,9 +73,10 @@ function App() {
           <span>Flag Number</span>
           <input
             type="number"
-            value={flagNumber}
-            onChange={(e) => setFlagNumber(Number(e.target.value))}
+            value={flag}
+            onChange={(e) => setFlag(Number(e.target.value))}
             min={0}
+            max={(category === 'event' ? 4 : 63)}
           />
         </label>
 
@@ -84,8 +84,10 @@ function App() {
           <label className="field">
             <span>Pokemon</span>
             <select value={pokemon} onChange={(e) => setPokemon(e.target.value)}>
-              {POKEMON_LIST.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {POKEMON_LIST.map((p, i) => (
+                DISALLOWED_POKEMON.indexOf(i) === -1 && (
+                  <option key={p} value={p}>{p}</option>
+                )
               ))}
             </select>
           </label>
@@ -94,7 +96,7 @@ function App() {
         {category === 'event' && (
           <label className="field">
             <span>Event</span>
-            <select value={event} onChange={(e) => setEvent(e.target.value)}>
+            <select value={EVENT_LIST[flag]} disabled={true} onChange={(e) => {}} title={"The value of the event is determined by the flag number."}>
               {EVENT_LIST.map((e) => (
                 <option key={e} value={e}>{e}</option>
               ))}

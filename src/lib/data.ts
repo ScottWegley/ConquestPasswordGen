@@ -18,11 +18,11 @@ export const EVENT_LIST = [
 /** Type representing the region of the game associated with the password. */
 export type Region = 'na' | 'jp';
 /** Type representing the category of the password, either Event or Pokemon. */
-export type Category = 'event' | 'pokemon';
+export type Category = 'pokemon' | 'event';
 /** Type containing the characters used in NA Passwords. */
-export const NA_PASSWORD_CHARS = "RJ8XB2cCmkZnDVqExFgGHraK3LwMN1ApW5iPUQzuS4TtvYb6de9fhjsy7";
+export const NA_PASSWORD_CHARS = "RJ8XB2cCmkZnDVqExFgGHraK3LwMN1ApW5iPUQzuS4TtvYb6de9fhjsy7".split('');
 /** Type containing the characters used in JP Passwords. */
-export const JP_PASSWORD_CHARS = "カイドタホ０トハミロオ２キセテナフヘマルメリレビエゼボクネガズサウヒノ６ニチ４ダケゴグバデコモヨ７ギ１ゲ９ヲ３ザ５ヤラブゾム８アヂベ";
+export const JP_PASSWORD_CHARS = "カイドタホ０トハミロオ２キセテナフヘマルメリレビエゼボクネガズサウヒノ６ニチ４ダケゴグバデコモヨ７ギ１ゲ９ヲ３ザ５ヤラブゾム８アヂベ".split('');
 
 export const NUMBER_CHARS = ["0０Oo", "1１Il|", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９"];
 export const JP_SIMILAR_CHARS = ["アァｧｱ", "イィｨｲ", "ウゥｩｳ", "エェｪｴ", "オォｫｵ", "ヤャｬﾔ", "ヨョｮﾖ", "カヵｶ", "キｷ", "クｸ", "ケヶｹ", "コｺ", "サｻ", "セｾ", "タﾀ", "チﾁ", "テﾃ", "トﾄ", "ナﾅ", "ニﾆ", "ネﾈ", "ノﾉ", "ハﾊ", "ヒﾋと", "フﾌ", "ヘﾍへ", "ホﾎ", "マﾏ", "ミﾐ", "ムﾑ", "メﾒ", "モﾓ", "ラﾗ", "リﾘり", "ルﾙ", "レﾚ", "ロﾛ", "ヲｦ"];
