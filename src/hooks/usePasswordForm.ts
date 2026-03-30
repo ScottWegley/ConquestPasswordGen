@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { JP_SCRAMBLE_CODES, NA_SCRAMBLE_CODES, POKEMON_LIST } from '../lib/data'
+import { JP_PASSWORD_CHARS, JP_SCRAMBLE_CODES, NA_PASSWORD_CHARS, NA_SCRAMBLE_CODES, POKEMON_LIST } from '../lib/data'
 import type { Region, Category } from '../lib/data'
 
 export function usePasswordForm() {
@@ -11,6 +11,7 @@ export function usePasswordForm() {
 
   const encode = () => {
     let passwd: Password = new Password(region, category, flag, pokemon);
+    setPassword(passwd.encode());
   }
 
   const decode = () => {
@@ -103,7 +104,7 @@ export class Password {
     rawBytes[1] = this._flag;
     rawBytes[2] = this._scramblePattern;
     rawBytes[3] = rawBytes[2] + 1;
-    rawBytes[4] = rawBytes[3] + 2;
+    rawBytes[4] = rawBytes[2] + 2;
     rawBytes[5] = POKEMON_LIST.indexOf(this._pokemon);
 
     console.log(`Raw bytes: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
@@ -116,10 +117,10 @@ export class Password {
     console.log(`Sum of raw bytes: ${checksum.toString(16).padStart(2, '0')}`);
     checksum = checksum & 0x3ff;
 
-    console.log(`Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+    console.log(`Secondary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
 
     // Third we embed the checksum back into the raw bytes
-    for(let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
       rawBytes[i] |= ((checksum >> (i * 2)) & 3) << 6;
     }
     console.log(`Raw bytes with checksum: ${rawBytes.map(b => b.toString(16).padStart(2, '0')).join(' ')}`);
@@ -137,22 +138,43 @@ export class Password {
     // Fifth we convert the shuffled bytes into the final password string
     let passBytes: number[] = [];
     passBytes[0] = shuffledBytes[0] % 0x39;
-    passBytes[3] = shuffledBytes[0] / 0x39;
+      passBytes[3] = Math.floor(shuffledBytes[0] / 0x39);
 
     passBytes[1] = shuffledBytes[1] % 0x39;
-    passBytes[3] |= (shuffledBytes[1] / 0x39) << 3;
+      passBytes[3] |= Math.floor(shuffledBytes[1] / 0x39) << 3;
 
     passBytes[2] = shuffledBytes[2] % 0x39;
-    passBytes[4] = shuffledBytes[2] / 0x39;
+      passBytes[4] = Math.floor(shuffledBytes[2] / 0x39);
 
     passBytes[5] = shuffledBytes[3] % 0x39;
-    passBytes[8] = shuffledBytes[3] / 0x39;
+      passBytes[8] = Math.floor(shuffledBytes[3] / 0x39);
 
     passBytes[6] = shuffledBytes[4] % 0x39;
-    passBytes[8] |= (shuffledBytes[4] / 0x39) << 3;
+      passBytes[8] |= Math.floor(shuffledBytes[4] / 0x39) << 3;
 
     passBytes[7] = shuffledBytes[5] % 0x39;
-    passBytes[9] = shuffledBytes[5] / 0x39;
-    return '';
+      passBytes[9] = Math.floor(shuffledBytes[5] / 0x39);
+      // Sixth we calculate the primary checksum and store it (NA only).
+      let mesh = (shuffledBytes[0] & 0xf) | (shuffledBytes[1] & 0xf) << 4;
+      checksum = Math.floor(mesh / 0x39);
+
+      passBytes[4] |= (checksum & 0x7) << 3;
+      console.log(`Group 1 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+
+      mesh = (shuffledBytes[3] & 0xf) | (shuffledBytes[4] & 0xf) << 4;
+      checksum = Math.floor(mesh / 0x39);
+
+      passBytes[9] |= (checksum & 0x7) << 3;
+      console.log(`Group 2 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
+}
+
+    // Finally we convert the password data into characters.
+    const charSet = this._region === 'na' ? NA_PASSWORD_CHARS : JP_PASSWORD_CHARS;
+    let password: string = '';
+    for (let i = 0; i < passBytes.length; i++) {
+      password += charSet[passBytes[i]];
+    }
+    console.log(`Final password: ${password}`);
+    return password;
   }
 }
