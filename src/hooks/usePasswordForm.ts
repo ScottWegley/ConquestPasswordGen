@@ -137,23 +137,40 @@ export class Password {
 
     // Fifth we convert the shuffled bytes into the final password string
     let passBytes: number[] = [];
-    passBytes[0] = shuffledBytes[0] % 0x39;
+    if (this._region === 'na') {
+      passBytes[0] = shuffledBytes[0] % 0x39;
       passBytes[3] = Math.floor(shuffledBytes[0] / 0x39);
 
-    passBytes[1] = shuffledBytes[1] % 0x39;
+      passBytes[1] = shuffledBytes[1] % 0x39;
       passBytes[3] |= Math.floor(shuffledBytes[1] / 0x39) << 3;
 
-    passBytes[2] = shuffledBytes[2] % 0x39;
+      passBytes[2] = shuffledBytes[2] % 0x39;
       passBytes[4] = Math.floor(shuffledBytes[2] / 0x39);
 
-    passBytes[5] = shuffledBytes[3] % 0x39;
+      passBytes[5] = shuffledBytes[3] % 0x39;
       passBytes[8] = Math.floor(shuffledBytes[3] / 0x39);
 
-    passBytes[6] = shuffledBytes[4] % 0x39;
+      passBytes[6] = shuffledBytes[4] % 0x39;
       passBytes[8] |= Math.floor(shuffledBytes[4] / 0x39) << 3;
 
-    passBytes[7] = shuffledBytes[5] % 0x39;
+      passBytes[7] = shuffledBytes[5] % 0x39;
       passBytes[9] = Math.floor(shuffledBytes[5] / 0x39);
+    } else {
+      // JP: 3 bytes → 4 chars per group, base-66
+      // Group 1 (bytes 0-2)
+      passBytes[0] = shuffledBytes[0] % 0x42;
+      passBytes[1] = shuffledBytes[1] % 0x42;
+      passBytes[2] = shuffledBytes[2] % 0x42;
+      passBytes[3] = Math.floor(shuffledBytes[0] / 0x42) | (Math.floor(shuffledBytes[1] / 0x42) << 2) | (Math.floor(shuffledBytes[2] / 0x42) << 4);
+
+      // Group 2 (bytes 3-5)
+      passBytes[4] = shuffledBytes[3] % 0x42;
+      passBytes[5] = shuffledBytes[4] % 0x42;
+      passBytes[6] = shuffledBytes[5] % 0x42;
+      passBytes[7] = Math.floor(shuffledBytes[3] / 0x42) | (Math.floor(shuffledBytes[4] / 0x42) << 2) | (Math.floor(shuffledBytes[5] / 0x42) << 4);
+    }
+
+    if (this._region === 'na') {
       // Sixth we calculate the primary checksum and store it (NA only).
       let mesh = (shuffledBytes[0] & 0xf) | (shuffledBytes[1] & 0xf) << 4;
       checksum = Math.floor(mesh / 0x39);
@@ -166,7 +183,7 @@ export class Password {
 
       passBytes[9] |= (checksum & 0x7) << 3;
       console.log(`Group 2 - Primary Checksum: ${checksum.toString(16).padStart(2, '0')}`);
-}
+    }
 
     // Finally we convert the password data into characters.
     const charSet = this._region === 'na' ? NA_PASSWORD_CHARS : JP_PASSWORD_CHARS;
