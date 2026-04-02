@@ -24,9 +24,6 @@ export const NA_PASSWORD_CHARS = "RJ8XB2cCmkZnDVqExFgGHraK3LwMN1ApW5iPUQzuS4TtvY
 /** Type containing the characters used in JP Passwords. */
 export const JP_PASSWORD_CHARS = "カイドタホ０トハミロオ２キセテナフヘマルメリレビエゼボクネガズサウヒノ６ニチ４ダケゴグバデコモヨ７ギ１ゲ９ヲ３ザ５ヤラブゾム８アヂベ".split('');
 
-export const NUMBER_CHARS = ["0０Oo", "1１Il|", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９"];
-export const JP_SIMILAR_CHARS = ["アァｧｱ", "イィｨｲ", "ウゥｩｳ", "エェｪｴ", "オォｫｵ", "ヤャｬﾔ", "ヨョｮﾖ", "カヵｶ", "キｷ", "クｸ", "ケヶｹ", "コｺ", "サｻ", "セｾ", "タﾀ", "チﾁ", "テﾃ", "トﾄ", "ナﾅ", "ニﾆ", "ネﾈ", "ノﾉ", "ハﾊ", "ヒﾋと", "フﾌ", "ヘﾍへ", "ホﾎ", "マﾏ", "ミﾐ", "ムﾑ", "メﾒ", "モﾓ", "ラﾗ", "リﾘり", "ルﾙ", "レﾚ", "ロﾛ", "ヲｦ"];
-
 export const NA_SCRAMBLE_CODES: number[] = [
   0x012453, 0x302541, 0x352041, 0x342501, 0x542301, 0x132540,
   0x512403, 0x142530, 0x032451, 0x102435, 0x142350, 0x402531,

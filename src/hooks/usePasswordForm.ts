@@ -11,11 +11,17 @@ export function usePasswordForm() {
 
   const encode = () => {
     let passwd: Password = new Password(region, category, flag, pokemon);
-    setPassword(passwd.encode(true));
+    setPassword(passwd.encode(false));
   }
 
   const decode = () => {
-    // TODO: implement decoding logic
+    let passwd: Password = Password.decode(password);
+    setRegion(passwd.region);
+    setCategory(passwd.category);
+    setFlag(passwd.flag);
+    if (category === 'pokemon') {
+      setPokemon(passwd.pokemon);
+    }
   }
 
   return {
@@ -219,5 +225,86 @@ export class Password {
       console.log(`Final password: ${password}`);
     }
     return password;
+  }
+
+  public static decode(password: string): Password {
+    // Enforce length and character set validity before attempting to decode
+    if (password.length !== 10 && password.length !== 8) {
+      throw new Error("Invalid password length");
+    }
+    let region: Region = (password.length === 10 ? 'na' : 'jp');
+    let passBytes: number[] = [];
+    password.split('').forEach(char => {
+      if ((region === 'na' ? NA_PASSWORD_CHARS : JP_PASSWORD_CHARS).indexOf(char) === -1) {
+        throw new Error(`Invalid character in password: ${char}`);
+      } else {
+        passBytes.push((region === 'na' ? NA_PASSWORD_CHARS : JP_PASSWORD_CHARS).indexOf(char));
+      }
+    });
+
+    let shuffleBytes: number[] = [];
+    // Base 66/57 deconversion
+    if (region === 'na') {
+      shuffleBytes[0] = (passBytes[3] & 7) * 0x39 + passBytes[0];
+      shuffleBytes[1] = (passBytes[3] >> 3) * 0x39 + passBytes[1];
+      shuffleBytes[2] = (passBytes[4] & 7) * 0x39 + passBytes[2];
+      shuffleBytes[3] = (passBytes[8] & 7) * 0x39 + passBytes[5];
+      shuffleBytes[4] = (passBytes[8] >> 3) * 0x39 + passBytes[6];
+      shuffleBytes[5] = (passBytes[9] & 3) * 0x39 + passBytes[7];
+    } else {
+      shuffleBytes[0] = (passBytes[3] & 3) * 0x42 + passBytes[0];
+      shuffleBytes[1] = ((passBytes[3] >> 2) & 3) * 0x42 + passBytes[1];
+      shuffleBytes[2] = (passBytes[3] >> 4) * 0x42 + passBytes[2];
+      shuffleBytes[3] = (passBytes[7] & 3) * 0x42 + passBytes[4];
+      shuffleBytes[4] = ((passBytes[7] >> 2) & 3) * 0x42 + passBytes[5];
+      shuffleBytes[5] = (passBytes[7] >> 4) * 0x42 + passBytes[6];
+    }
+
+    // Primary Checksum Validation (NA only)
+    if (region === 'na') {
+      let mesh = (shuffleBytes[0] & 0xf) | (shuffleBytes[1] & 0xf) << 4;
+      let checksum = Math.floor(mesh / 0x39);
+      let passChecksum = (passBytes[4] >> 3);
+      if (checksum !== passChecksum) {
+        throw new Error("Primary checksum validation failed for group 1");
+      }
+      mesh = (shuffleBytes[3] & 0xf) | (shuffleBytes[4] & 0xf) << 4;
+      checksum = Math.floor(mesh / 0x39);
+      passChecksum = (passBytes[9] >> 3);
+      if (checksum !== passChecksum) {
+        throw new Error("Primary checksum validation failed for group 2");
+      }
+    }
+
+    // Unshuffle the bytes
+    let index = (shuffleBytes[2] & 0x3f) ^ 2;
+    let rawBytes: number[] = [];
+    let descramblePattern = (region === 'na' ? NA_SCRAMBLE_CODES : JP_SCRAMBLE_CODES)[index];
+
+    for (let i = 0; i < 6; i++) {
+      rawBytes[i] = shuffleBytes[descramblePattern >> (4 * (5 - i)) & 0xf] ^ i;
+    }
+
+    // Secondary Checksum Validation
+    let passChecksum = 0;
+    for (let i = 0; i < 5; i++) {
+      passChecksum |= (rawBytes[i] >> 6) << (2 * i);
+    }
+
+    let checksum = rawBytes[5];
+    for (let i = 0; i < 5; i++) {
+      checksum += rawBytes[i] & 0x3f;
+    }
+    checksum &= 0x3ff;
+    if (checksum !== passChecksum) {
+      throw new Error("Secondary checksum validation failed");
+    }
+
+    // Construct the password object
+    let category: Category = (rawBytes[0] & 0x3f) === 0 ? 'pokemon' : 'event';
+    let flag: number = rawBytes[1] & 0x3f;
+    let scramblePattern: number = rawBytes[2] & 0x3f;
+    let pokemon: string = POKEMON_LIST[rawBytes[5] & 0x3f];
+    return new Password(region, category, flag, pokemon, scramblePattern);
   }
 }
